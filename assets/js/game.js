@@ -5,25 +5,47 @@ var randomNumber = function(min, max) {
   return value;
 };
 
+var fightOrSkip = function() {
+  // ask player if they'd like to fight or skip using fightOrSkip function
+  var promptFight = window.prompt('Would you like to FIGHT or SKIP this battle? Enter "FIGHT" or "SKIP" to choose.');
+
+  if (promptFight === "" || promptFight === null) {
+    window.alert("You need to provide a valid answer! Please try again.");
+    return fightOrSkip();
+  }
+
+  // convert promptFight to all lowercase so we can check with less options
+  promptFight = promptFight.toLowerCase();
+
+  // if player picks "skip" confirm and then stop the loop
+  if (promptFight === "skip") {
+    // confirm player wants to skip
+    var confirmSkip = window.confirm("Are you sure you'd like to quit?");
+
+    // if yes (true), leave fight
+    if (confirmSkip) {
+      window.alert(playerInfo.name + " has decided to skip this fight. Goodbye!");
+      // subtract money from playerMoney for skipping
+      playerInfo.playerMoney = playerInfo.money - 10;
+
+      // return true if player wants to leave
+      return true;
+      shop();
+    }
+  }
+  return false;
+};  
+
+
+
+
+
 // fight function (now with parameter for enemy's name)
 var fight = function(enemy) {
   while (playerInfo.health > 0 && enemy.health > 0) {
-    // ask player if they'd like to fight or run
-    var promptFight = window.prompt('Would you like to FIGHT or SKIP this battle? Enter "FIGHT" or "SKIP" to choose.');
-
-    // if player picks "skip" confirm and then stop the loop
-    if (promptFight === "skip" || promptFight === "SKIP") {
-      // confirm player wants to skip
-      var confirmSkip = window.confirm("Are you sure you'd like to quit?");
-
-      // if yes (true), leave fight
-      if (confirmSkip) {
-        window.alert(playerInfo.name + ' has decided to skip this fight. Goodbye!');
-        // subtract money from playerInfo.money for skipping
-        playerInfo.money = Math.max(0, playerInfo.money - 10);
-        console.log("playerInfo.money", playerInfo.money);
-        break;
-      }
+    if (fightOrSkip()) {
+      // if true, leave fight by breaking loop
+      break;
     }
 
     // remove enemy's health by subtracting the amount set in the playerInfo.attack variable
@@ -31,12 +53,12 @@ var fight = function(enemy) {
 
     enemy.health = Math.max(0, enemy.health - damage);
     console.log(
-      playerInfo.name + ' attacked ' + enemyName + '. ' + enemyName + ' now has ' + enemy.health + ' health remaining.'
+      playerInfo.name + ' attacked ' + enemy.name + '. ' + enemy.name + ' now has ' + enemy.health + ' health remaining.'
     );
 
     // check enemy's health
     if (enemy.health <= 0) {
-      window.alert(enemyName + ' has died!');
+      window.alert(enemy.name + ' has died!');
 
       // award player money for winning
       playerInfo.money = playerInfo.money + 20;
@@ -44,15 +66,15 @@ var fight = function(enemy) {
       // leave while() loop since enemy is dead
       break;
     } else {
-      window.alert(enemyName + ' still has ' + enemy.health + ' health left.');
+      window.alert(enemy.name + ' still has ' + enemy.health + ' health left.');
     }
 
-    // remove players's health by subtracting the amount set in the enemyAttack variable
-    var damage = randomNumber(enemyAttack - 3, enemyAttack);
+    // remove players's health by subtracting the amount set in the enemy.attack variable
+    var damage = randomNumber(enemy.attack - 3, enemy.attack);
 
     playerInfo.health = Math.max(0, playerInfo.health - damage);
     console.log(
-      enemyName + ' attacked ' + playerInfo.name + '. ' + playerInfo.name + ' now has ' + playerInfo.health + ' health remaining.'
+      enemy.name + ' attacked ' + playerInfo.name + '. ' + playerInfo.name + ' now has ' + playerInfo.health + ' health remaining.'
     );
 
     // check player's health
@@ -87,7 +109,7 @@ for (var i = 0; i < enemyInfo.length; i++) {
     window.alert('Welcome to Robot Gladiators! Round ' + (i + 1));
     
 
-    // pick new enemy to fight based on the index of the enemyNames array
+    // pick new enemy to fight based on the index of the enemy.names array
     var pickedEnemyObj = enemyInfo[i];
 
     // reset enemy.health before starting new fight
@@ -96,7 +118,7 @@ for (var i = 0; i < enemyInfo.length; i++) {
     // use debugger to pause script from running and check what's going on at that moment in the code
     // debugger;
 
-    // pass the pickedEnemyName variable's value into the fight function, where it will assume the value of the enemyName parameter
+    // pass the pickedenemy.name variable's value into the fight function, where it will assume the value of the enemy.name parameter
     fight(pickedEnemyObj);
 
     // if we're not at the last enemy in the array
